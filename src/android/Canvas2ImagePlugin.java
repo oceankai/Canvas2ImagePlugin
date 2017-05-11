@@ -19,6 +19,10 @@ import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.HttpURLConnection;
+
 /**
  * Canvas2ImagePlugin.java
  *
@@ -37,14 +41,20 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 
 		if (action.equals(ACTION)) {
 
-			String base64 = data.optString(0);
-			if (base64.equals("")) // isEmpty() requires API level 9
+			//String base64 = data.optString(0);
+			//if (base64.equals("")) // isEmpty() requires API level 9
 				callbackContext.error("Missing base64 string");
 			
 			// Create the bitmap from the base64 string
-			Log.d("Canvas2ImagePlugin", base64);
-			byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
-			Bitmap bmp = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+			//Log.d("Canvas2ImagePlugin", base64);
+			//byte[] decodedString = Base64.decode(base64, Base64.DEFAULT);
+			//Bitmap bmp = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+
+			String imageUrl = data.optString(0);
+      // 获取图片
+      Bitmap bmp = getHttpBitmap(imageUrl);
+
 			if (bmp == null) {
 				callbackContext.error("The image could not be decoded");
 			} else {
@@ -65,6 +75,39 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 			return false;
 		}
 	}
+
+  /**
+    * 获取网落图片资源 
+    * @param url
+    * @return
+    */
+   public static Bitmap getHttpBitmap(String url){
+    URL myFileURL;
+    Bitmap bitmap=null;
+    try{
+       myFileURL = new URL(url);
+       //获得连接
+       HttpURLConnection conn=(HttpURLConnection)myFileURL.openConnection();
+       //设置超时时间为6000毫秒，conn.setConnectionTiem(0);表示没有时间限制
+       conn.setConnectTimeout(6000);
+       //连接设置获得数据流
+       conn.setDoInput(true);
+       //不使用缓存
+       conn.setUseCaches(false);
+       //这句可有可无，没有影响
+       //conn.connect();
+       //得到数据流
+       InputStream is = conn.getInputStream();
+       //解析得到图片
+       bitmap = BitmapFactory.decodeStream(is);
+       //关闭数据流
+       is.close();
+      }catch(Exception e){
+       e.printStackTrace();
+      }
+      return bitmap;
+   }
+  
 
 	private File savePhoto(Bitmap bmp) {
 		File retVal = null;
