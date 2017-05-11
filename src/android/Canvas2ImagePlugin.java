@@ -43,7 +43,7 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 
 			//String base64 = data.optString(0);
 			//if (base64.equals("")) // isEmpty() requires API level 9
-				callbackContext.error("Missing base64 string");
+			// callbackContext.error("Missing base64 string");
 			
 			// Create the bitmap from the base64 string
 			//Log.d("Canvas2ImagePlugin", base64);
@@ -52,8 +52,8 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 
 
 			String imageUrl = data.optString(0);
-      // 获取图片
-      Bitmap bmp = getHttpBitmap(imageUrl);
+      		// get imageUrl
+      		Bitmap bmp = getHttpBitmap(imageUrl);
 
 			if (bmp == null) {
 				callbackContext.error("The image could not be decoded");
